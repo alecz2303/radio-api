@@ -12,10 +12,13 @@ class ChannelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $slug)
     {
-        $station = Station::where('slug', $stationSlug)->firstOrFail();
-        return $station->channels()->where('is_active', true)->get();
+        $station = Station::where('slug', $slug)->firstOrFail();
+
+        return $station->channels()
+            ->where('is_active', true)
+            ->get();
     }
 
     /**
@@ -29,9 +32,10 @@ class ChannelController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $stationSlug, string $channelSlug)
+    public function show(string $slug, string $channelSlug)
     {
-        $station = Station::where('slug', $stationSlug)->firstOrFail();
+        $station = Station::where('slug', $slug)->firstOrFail();
+
         return Channel::where('station_id', $station->id)
             ->where('slug', $channelSlug)
             ->firstOrFail();
