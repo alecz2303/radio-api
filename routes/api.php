@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\StationController;
 use App\Http\Controllers\Api\V1\ChannelController;
+use App\Http\Controllers\Api\V1\SongRequestController;
 use App\Http\Controllers\Api\AuthController;
 
 Route::get('/user', function (Request $request) {
@@ -29,4 +30,5 @@ Route::prefix('v1')->group(function () {
     Route::get('stations/{slug}', [StationController::class, 'show']);
     Route::get('stations/{slug}/channels', [ChannelController::class, 'index']);
     Route::get('stations/{slug}/channels/{channelSlug}', [ChannelController::class, 'show']);
+    Route::post('song-requests', [SongRequestController::class, 'store']);
 });
