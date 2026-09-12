@@ -17,6 +17,9 @@
                     <x-nav-link :href="route('admin.channels.index')" :active="request()->routeIs('admin.channels.*')">
                         📡 Canales
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.song-requests.index')" :active="request()->routeIs('admin.song-requests.*')">
+                        🎵 Solicitudes
+                    </x-nav-link>
                 </div>
             </div>
 
