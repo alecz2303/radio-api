@@ -27,5 +27,5 @@ Route::prefix('v1')->group(function () {
     Route::get('stations/{slug}/channels', [ChannelController::class, 'index']);
     Route::get('stations/{slug}/channels/{channelSlug}', [ChannelController::class, 'show']);
     Route::post('song-requests', [SongRequestController::class, 'store']);
-    Route::post('push-devices', [PushDeviceController::class, 'store']);
+    Route::post('push-devices', [PushDeviceController::class, 'store'])->middleware('throttle:30,1');
 });
