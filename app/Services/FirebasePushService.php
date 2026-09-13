@@ -34,25 +34,36 @@ class FirebasePushService
 
         $accessToken = $this->accessToken($credentials);
         $projectId = $credentials['project_id'];
+        $messageData = collect($data)
+            ->filter(fn ($value) => $value !== null && $value !== '')
+            ->map(fn ($value) => (string) $value)
+            ->all();
+
+        $message = [
+            'token' => $token,
+            'notification' => [
+                'title' => $title,
+                'body' => $body,
+            ],
+            'android' => [
+                'priority' => 'high',
+                'notification' => [
+                    'channel_id' => 'somos_radio_updates',
+                    'sound' => 'default',
+                ],
+            ],
+        ];
+
+        // FCM HTTP v1 expects data to be a string map. An empty PHP array is
+        // encoded as [] (a JSON list), so omit the field when there is no data.
+        if ($messageData !== []) {
+            $message['data'] = $messageData;
+        }
 
         $response = Http::withToken($accessToken)
             ->acceptJson()
             ->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
-                'message' => [
-                    'token' => $token,
-                    'notification' => [
-                        'title' => $title,
-                        'body' => $body,
-                    ],
-                    'data' => collect($data)->map(fn ($value) => (string) $value)->all(),
-                    'android' => [
-                        'priority' => 'high',
-                        'notification' => [
-                            'channel_id' => 'somos_radio_updates',
-                            'sound' => 'default',
-                        ],
-                    ],
-                ],
+                'message' => $message,
             ]);
 
         if ($response->failed()) {
