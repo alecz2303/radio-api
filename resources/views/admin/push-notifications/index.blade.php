@@ -110,6 +110,12 @@
                                 <span>{{ $notification->success_count }} enviadas</span>
                                 <span>{{ $notification->failure_count }} fallidas</span>
                             </div>
+                            @if($notification->error_text)
+                                <div class="mt-4 rounded-xl border border-red-500/20 bg-red-500/[0.08] p-3 text-xs leading-relaxed text-red-200">
+                                    <div class="mb-1 font-black uppercase tracking-[.14em] text-red-300">Error de Firebase</div>
+                                    <div class="whitespace-pre-wrap break-words">{{ $notification->error_text }}</div>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <div class="px-6 py-12 text-center text-sm text-zinc-600">Todavía no se han enviado notificaciones.</div>
