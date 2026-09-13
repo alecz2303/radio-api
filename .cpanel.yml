@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/djira/public_html/radio-api.djira.xyz/
-    - /usr/bin/rsync -a --exclude='.git/' --exclude='.env' --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' --exclude='public/build/' --exclude='public/hot' --exclude='public/storage' ./ $DEPLOYPATH
+    - /usr/bin/rsync -a --exclude='.git/' --exclude='.env' --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' --exclude='public/hot' --exclude='public/storage' ./ $DEPLOYPATH
