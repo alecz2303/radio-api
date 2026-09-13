@@ -1,55 +1,65 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 shadow-sm">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <!-- Logo -->
-            <div class="flex items-center space-x-8">
-                <a href="{{ route('dashboard') }}" class="flex items-center space-x-2">
-                    <x-application-logo class="h-8 w-auto text-gray-800" />
-                    <span class="font-bold text-lg text-gray-800">Radio Admin</span>
+<nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+    <div class="admin-container">
+        <div class="flex h-16 items-center justify-between gap-4">
+            <div class="flex min-w-0 items-center gap-7">
+                <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-black shadow-lg shadow-orange-500/10">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 10v4m4-7v10m4-14v18m4-14v10m4-7v4" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0 leading-tight">
+                        <div class="truncate text-sm font-black tracking-wide text-white">RADIO ADMIN</div>
+                        <div class="truncate text-[10px] font-bold uppercase tracking-[0.22em] text-orange-400">Control de emisoras</div>
+                    </div>
                 </a>
 
-                <!-- Main Menu Links -->
-                <div class="hidden space-x-6 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('admin.stations.index')" :active="request()->routeIs('admin.stations.*')">
-                        🎙️ Estaciones
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.channels.index')" :active="request()->routeIs('admin.channels.*')">
-                        📡 Canales
-                    </x-nav-link>
-                    <x-nav-link :href="route('admin.song-requests.index')" :active="request()->routeIs('admin.song-requests.*')">
-                        🎵 Solicitudes
-                    </x-nav-link>
+                <div class="hidden items-center gap-1 md:flex">
+                    <a href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('dashboard') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Resumen</a>
+                    <a href="{{ route('admin.stations.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.stations.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Estaciones</a>
+                    <a href="{{ route('admin.channels.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.channels.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Canales</a>
+                    <a href="{{ route('admin.song-requests.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.song-requests.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Solicitudes</a>
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
+            <div class="hidden items-center gap-3 md:flex">
+                <div class="text-right leading-tight">
+                    <div class="text-xs font-bold text-white">{{ Auth::user()->name }}</div>
+                    <div class="text-[10px] uppercase tracking-wider text-zinc-500">Administrador</div>
+                </div>
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button
-                            class="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" viewBox="0 0 20 20">
-                                    <path
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                                </svg>
-                            </div>
+                        <button class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:border-orange-500/30 hover:text-orange-300">
+                            <span class="text-sm font-black">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                         </button>
                     </x-slot>
-
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')"> Perfil </x-dropdown-link>
+                        <x-dropdown-link :href="route('profile.edit')">Perfil</x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                Cerrar sesión
-                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</x-dropdown-link>
                         </form>
                     </x-slot>
                 </x-dropdown>
+            </div>
+
+            <button @click="open = !open" class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-300 md:hidden">
+                <svg x-show="!open" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                <svg x-show="open" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+
+        <div x-show="open" x-cloak class="border-t border-white/10 py-3 md:hidden">
+            <div class="grid gap-1">
+                <a href="{{ route('dashboard') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Resumen</a>
+                <a href="{{ route('admin.stations.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Estaciones</a>
+                <a href="{{ route('admin.channels.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Canales</a>
+                <a href="{{ route('admin.song-requests.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Solicitudes</a>
+                <a href="{{ route('profile.edit') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Perfil</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-sm font-bold text-red-300 hover:bg-red-500/10">Cerrar sesión</button>
+                </form>
             </div>
         </div>
     </div>
