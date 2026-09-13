@@ -1,93 +1,71 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Estaciones de Radio
-        </h2>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <div class="admin-kicker">Infraestructura</div>
+                <h1 class="admin-title">Estaciones</h1>
+                <p class="admin-subtitle">Administra las marcas de radio y su disponibilidad dentro de la plataforma.</p>
+            </div>
+            <a href="{{ route('admin.stations.create') }}" class="admin-btn-primary">+ Nueva estación</a>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            {{-- Botón para nueva estación --}}
-            <div class="flex justify-end mb-4">
-                <a href="{{ route('admin.stations.create') }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                    + Nueva Estación
-                </a>
+    <div class="admin-container py-7">
+        <div class="admin-table-wrap">
+            <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div>
+                    <div class="text-sm font-black text-white">Estaciones registradas</div>
+                    <div class="text-xs text-zinc-500">{{ $stations->total() }} en total</div>
+                </div>
             </div>
 
-            {{-- Tabla de estaciones --}}
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <table class="min-w-full text-sm text-left border-collapse">
-                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3 border-b">Nombre</th>
-                            <th class="px-6 py-3 border-b">Slug</th>
-                            <th class="px-6 py-3 border-b text-center">Activa</th>
-                            <th class="px-6 py-3 border-b text-right">Acciones</th>
+                            <th>Estación</th>
+                            <th>Identificador</th>
+                            <th>Estado</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody>
                         @forelse ($stations as $station)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-3">{{ $station->name }}</td>
-                                <td class="px-6 py-3">{{ $station->slug }}</td>
-                                <td class="px-6 py-3 text-center">
+                            <tr>
+                                <td>
+                                    <div class="font-black text-white">{{ $station->name }}</div>
+                                    <div class="mt-1 text-xs text-zinc-500">Radio station</div>
+                                </td>
+                                <td><code class="rounded-lg bg-black/30 px-2 py-1 text-xs text-zinc-400">{{ $station->slug }}</code></td>
+                                <td>
                                     @if($station->is_active)
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
-                                            Activa
-                                        </span>
+                                        <span class="admin-badge-success"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Activa</span>
                                     @else
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
-                                            Inactiva
-                                        </span>
+                                        <span class="admin-badge-muted">Inactiva</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-3 text-right space-x-2">
-                                    {{-- Ver canales --}}
-                                    <a href="{{ route('admin.stations.channels', $station) }}"
-                                        class="text-green-600 hover:text-green-800 font-medium">
-                                        Ver canales
-                                    </a>
-                                    {{-- Editar --}}
-                                    <a href="{{ route('admin.stations.edit', $station) }}"
-                                       class="text-blue-600 hover:text-blue-800 font-medium">
-                                        Editar
-                                    </a>
-
-                                    {{-- Eliminar --}}
-                                    <form action="{{ route('admin.stations.destroy', $station) }}"
-                                          method="POST"
-                                          class="inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button"
-                                                class="text-red-600 hover:text-red-800 delete-btn font-medium">
-                                            Eliminar
-                                        </button>
-                                    </form>
+                                <td>
+                                    <div class="flex flex-wrap justify-end gap-2">
+                                        <a href="{{ route('admin.stations.channels', $station) }}" class="admin-btn-secondary !px-3 !py-2">Canales</a>
+                                        <a href="{{ route('admin.stations.edit', $station) }}" class="admin-btn-secondary !px-3 !py-2">Editar</a>
+                                        <form action="{{ route('admin.stations.destroy', $station) }}" method="POST" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="admin-btn-danger delete-btn">Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                    No hay estaciones registradas.
-                                </td>
+                                <td colspan="4" class="!py-12 text-center text-zinc-500">No hay estaciones registradas.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
-            {{-- Paginación --}}
-            <div class="mt-4">
-                {{ $stations->links() }}
-            </div>
-
         </div>
+
+        <div class="mt-5">{{ $stations->links() }}</div>
     </div>
-
-    {{-- SweetAlerts globales --}}
-    <x-sweet-alerts />
-
 </x-app-layout>
