@@ -1,99 +1,85 @@
 <x-app-layout>
     <x-slot name="header">
-
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Canales / Emisoras
-        </h2>
-
-        @if(isset($station))
-            <div class="flex items-center justify-between">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Canales de {{ $station->name }}
-                </h2>
-                <a href="{{ route('admin.stations.index') }}"
-                class="text-sm text-blue-600 hover:text-blue-800 underline">
-                ← Volver a estaciones
-                </a>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <div class="admin-kicker">Señales</div>
+                <h1 class="admin-title">{{ isset($station) ? 'Canales de '.$station->name : 'Canales' }}</h1>
+                <p class="admin-subtitle">Administra streams, estado y pertenencia de cada señal publicada.</p>
             </div>
-        @else
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Todos los canales
-            </h2>
-        @endif
-
+            <div class="flex flex-wrap gap-2">
+                @if(isset($station))
+                    <a href="{{ route('admin.stations.index') }}" class="admin-btn-secondary">← Estaciones</a>
+                @endif
+                <a href="{{ isset($station) ? route('admin.channels.create', ['station_id' => $station->id]) : route('admin.channels.create') }}" class="admin-btn-primary">+ Nuevo canal</a>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="flex justify-end mb-4">
-                <a href="{{ isset($station)
-                        ? route('admin.channels.create', ['station_id' => $station->id])
-                        : route('admin.channels.create') }}"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                + Nuevo Canal
-                </a>
+    <div class="admin-container py-7">
+        <div class="admin-table-wrap">
+            <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+                <div>
+                    <div class="text-sm font-black text-white">Señales configuradas</div>
+                    <div class="text-xs text-zinc-500">{{ $channels->total() }} registros</div>
+                </div>
             </div>
 
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <table class="min-w-full text-sm text-left border-collapse">
-                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3 border-b">Estación</th>
-                            <th class="px-6 py-3 border-b">Nombre</th>
-                            <th class="px-6 py-3 border-b">Slug</th>
-                            <th class="px-6 py-3 border-b">Stream</th>
-                            <th class="px-6 py-3 border-b text-center">Activo</th>
-                            <th class="px-6 py-3 border-b text-right">Acciones</th>
+                            <th>Estación</th>
+                            <th>Canal</th>
+                            <th>Slug</th>
+                            <th>Stream</th>
+                            <th>Estado</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody>
                         @forelse ($channels as $channel)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-3">{{ $channel->station->name ?? '-' }}</td>
-                                <td class="px-6 py-3">{{ $channel->name }}</td>
-                                <td class="px-6 py-3">{{ $channel->slug }}</td>
-                                <td class="px-6 py-3 truncate max-w-xs">
-                                    <a href="{{ $channel->stream_url }}" class="text-blue-600 underline" target="_blank">
-                                        {{ Str::limit($channel->stream_url, 40) }}
-                                    </a>
+                            <tr>
+                                <td class="text-zinc-400">{{ $channel->station->name ?? '-' }}</td>
+                                <td>
+                                    <div class="font-black text-white">{{ $channel->name }}</div>
+                                    <div class="mt-1 text-xs text-zinc-500">{{ $channel->frequency ?? '' }} {{ $channel->city ?? '' }}</div>
                                 </td>
-                                <td class="px-6 py-3 text-center">
-                                    @if($channel->is_active)
-                                        <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Sí</span>
+                                <td><code class="rounded-lg bg-black/30 px-2 py-1 text-xs text-zinc-400">{{ $channel->slug }}</code></td>
+                                <td class="max-w-xs">
+                                    @if($channel->stream_url)
+                                        <a href="{{ $channel->stream_url }}" target="_blank" class="admin-link block truncate text-xs">{{ Str::limit($channel->stream_url, 45) }}</a>
                                     @else
-                                        <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">No</span>
+                                        <span class="text-xs text-zinc-600">Sin stream</span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-3 text-right space-x-2">
-                                    <a href="{{ route('admin.channels.edit', $channel) }}"
-                                       class="text-blue-600 hover:text-blue-800 font-medium">Editar</a>
-
-                                    <form action="{{ route('admin.channels.destroy', $channel) }}"
-                                          method="POST"
-                                          class="inline delete-form">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="button"
-                                                class="text-red-600 hover:text-red-800 delete-btn font-medium">
-                                            Eliminar
-                                        </button>
-                                    </form>
+                                <td>
+                                    @if($channel->is_active)
+                                        <span class="admin-badge-success"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> En línea</span>
+                                    @else
+                                        <span class="admin-badge-muted">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="flex flex-wrap justify-end gap-2">
+                                        <a href="{{ route('admin.channels.edit', $channel) }}" class="admin-btn-secondary !px-3 !py-2">Editar</a>
+                                        <form action="{{ route('admin.channels.destroy', $channel) }}" method="POST" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="admin-btn-danger delete-btn">Eliminar</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                    No hay canales registrados.
-                                </td>
+                                <td colspan="6" class="!py-12 text-center text-zinc-500">No hay canales registrados.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
-            <div class="mt-4">{{ $channels->links() }}</div>
         </div>
-    </div>
 
-    <x-sweet-alerts />
+        <div class="mt-5">{{ $channels->links() }}</div>
+    </div>
 </x-app-layout>
