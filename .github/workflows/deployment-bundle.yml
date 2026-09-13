@@ -1,0 +1,32 @@
+name: Build deployment bundle
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Prepare deployment bundle
+        run: |
+          zip -qr radio-api-main.zip . \
+            -x 'radio-api-main.zip' \
+               'node_modules/*' \
+               'vendor/*' \
+               '.env' \
+               '.env.*' \
+               'storage/logs/*'
+
+      - name: Upload bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: radio-api-main
+          path: radio-api-main.zip
+          retention-days: 7
