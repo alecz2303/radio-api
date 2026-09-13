@@ -10,7 +10,9 @@ use App\Models\Channel;
 use App\Models\SongRequest;
 
 Route::get('/', function () {
-    return view('welcome');
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 });
 
 require __DIR__.'/auth.php';
