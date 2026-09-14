@@ -28,6 +28,19 @@
                 <form method="POST" action="{{ route('admin.push-notifications.store') }}" class="space-y-5">
                     @csrf
                     <div>
+                        <label for="template" class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Plantilla rápida</label>
+                        <select id="template" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
+                            <option value="">Escribir mensaje manualmente</option>
+                            <option value="test">🔔 Prueba de notificación</option>
+                            <option value="live891">▶ Escuchar 89.1 FM</option>
+                            <option value="live1029">▶ Escuchar 102.9 FM</option>
+                            <option value="participate">🎙️ Invitar a participar</option>
+                            <option value="latest">📰 Abrir Lo último</option>
+                            <option value="general">📻 Abrir En vivo</option>
+                        </select>
+                        <p class="mt-2 text-xs text-zinc-600">La plantilla llena título, mensaje y destino; puedes editar todo antes de enviar.</p>
+                    </div>
+                    <div>
                         <label for="title" class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Título</label>
                         <input id="title" name="title" value="{{ old('title') }}" maxlength="120" required placeholder="Ej. Estamos al aire" class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500">
                         @error('title')<p class="mt-2 text-xs text-red-300">{{ $message }}</p>@enderror
@@ -76,4 +89,26 @@
             </div>
         </section>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const templates = {
+                test: ['🔔 Prueba de Somos Radio', 'Esta es una notificación de prueba de la app de Somos Radio.', ''],
+                live891: ['🔴 Somos Radio 89.1 está al aire', 'Acompáñanos ahora. Toca para escuchar en vivo. 📻', 'play:somos-radio-89-1'],
+                live1029: ['🔴 Somos Radio 102.9 está al aire', 'Acompáñanos ahora. Toca para escuchar en vivo. 📻', 'play:somos-radio-102-9'],
+                participate: ['🎙️ Tu voz también es parte de Somos', 'Pide tu canción y envía tu dedicatoria directamente desde la app.', 'participate'],
+                latest: ['📰 Lo último en Somos Radio', 'Descubre el contenido disponible en la app de Somos Radio.', 'latest'],
+                general: ['📻 Somos Radio en tu teléfono', 'Escucha nuestras estaciones en vivo desde la app.', 'live'],
+            };
+            const template = document.getElementById('template');
+            const title = document.getElementById('title');
+            const body = document.getElementById('body');
+            const action = document.getElementById('action');
+            template?.addEventListener('change', () => {
+                const selected = templates[template.value];
+                if (!selected) return;
+                [title.value, body.value, action.value] = selected;
+            });
+        });
+    </script>
 </x-app-layout>
