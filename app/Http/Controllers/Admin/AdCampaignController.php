@@ -80,7 +80,7 @@ class AdCampaignController extends Controller
             'station_id' => 'nullable|exists:stations,id',
             'image' => ($imageRequired ? 'required' : 'nullable') . '|image|mimes:jpg,jpeg,png,webp|max:4096',
             'target_url' => 'nullable|url|max:500',
-            'placement' => 'required|in:home',
+            'placement' => 'required|in:home,splash',
             'sort_order' => 'nullable|integer|min:0|max:9999',
             'starts_at' => 'nullable|date',
             'ends_at' => 'nullable|date|after_or_equal:starts_at',
