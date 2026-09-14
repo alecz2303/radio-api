@@ -13,7 +13,7 @@ class AdCampaignController extends Controller
     {
         $data = $request->validate([
             'station_slug' => 'nullable|string|max:100',
-            'placement' => 'nullable|in:home',
+            'placement' => 'nullable|in:home,splash',
         ]);
 
         $stationId = null;
