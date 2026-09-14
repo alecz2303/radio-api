@@ -1,187 +1,43 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <div class="admin-kicker">Monetización</div>
-                <h1 class="admin-title">Publicidad</h1>
-                <p class="admin-subtitle">Administra anuncios de apertura, banners del inicio, vigencia y métricas desde un solo lugar.</p>
-            </div>
-            <div class="flex flex-wrap gap-2 text-xs font-bold text-zinc-300">
-                <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ $stats['active'] }} activas</span>
-                <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ number_format($stats['impressions']) }} impresiones</span>
-                <span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ number_format($stats['clicks']) }} clics</span>
-            </div>
+            <div><div class="admin-kicker">Monetización</div><h1 class="admin-title">Publicidad</h1><p class="admin-subtitle">Administra anuncios de apertura, banners del inicio, vigencia y métricas desde un solo lugar.</p></div>
+            <div class="flex flex-wrap gap-2 text-xs font-bold text-zinc-300"><span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ $stats['active'] }} activas</span><span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ number_format($stats['impressions']) }} impresiones</span><span class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{{ number_format($stats['clicks']) }} clics</span></div>
         </div>
     </x-slot>
 
     <div class="admin-container py-7 space-y-7">
-        @if(session('success'))
-            <div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{{ session('success') }}</div>
-        @endif
+        @if(session('success'))<div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{{ session('success') }}</div>@endif
+        @if($errors->any())<div class="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200"><div class="font-black">Revisa los datos de la campaña.</div><ul class="mt-2 list-disc space-y-1 pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 
-        @if($errors->any())
-            <div class="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                <div class="font-black">Revisa los datos de la campaña.</div>
-                <ul class="mt-2 list-disc space-y-1 pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
-            </div>
-        @endif
+        <section class="admin-panel p-6">
+            <div class="mb-6"><div class="admin-kicker">Nueva campaña</div><h2 class="mt-1 text-xl font-black text-white">Agregar publicidad</h2><p class="mt-2 text-sm text-zinc-500">Configura el anuncio y elige dónde aparecerá. Se publica sin actualizar la app.</p></div>
+            <form method="POST" action="{{ route('admin.ads.store') }}" enctype="multipart/form-data" class="space-y-5">@csrf
+                <div class="grid gap-4 lg:grid-cols-2"><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Nombre de campaña</label><input name="name" value="{{ old('name') }}" required maxlength="120" placeholder="Ej. Restaurante La Casona · Septiembre" class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500"></div><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Anunciante</label><input name="advertiser" value="{{ old('advertiser') }}" maxlength="120" placeholder="Nombre comercial" class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500"></div></div>
+                <div class="grid gap-4 lg:grid-cols-2"><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Estación</label><select name="station_id" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"><option value="">Ambas estaciones</option>@foreach($stations as $station)<option value="{{ $station->id }}" @selected((string)old('station_id') === (string)$station->id)>{{ $station->name }}</option>@endforeach</select></div><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Ubicación en la app</label><select id="placement" name="placement" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"><option value="splash" @selected(old('placement','splash')==='splash')>Pantalla completa al abrir la app</option><option value="home" @selected(old('placement')==='home')>Banner dentro de Inicio</option></select><p id="placement-help" class="mt-2 text-xs text-zinc-600"></p></div></div>
+                <div class="grid gap-4 lg:grid-cols-2"><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Imagen publicitaria</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp" required class="block w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-500 file:px-3 file:py-2 file:text-xs file:font-black file:text-black"><p class="mt-2 text-xs text-zinc-600">WEBP recomendado. Apertura 1080×1920 · Inicio 1200×450 · máximo 4 MB.</p></div><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Enlace al tocar</label><input type="url" name="target_url" value="{{ old('target_url') }}" placeholder="https://..." class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white"></div></div>
+                <div class="grid gap-4 sm:grid-cols-2"><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Inicia</label><input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"></div><div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Termina</label><input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"></div></div>
+                <input type="hidden" name="sort_order" value="0"><div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><label class="flex items-center gap-3"><input type="checkbox" name="is_active" value="1" checked class="rounded border-white/20 bg-zinc-900 text-orange-500"><span><span class="block text-sm font-bold text-white">Campaña activa</span><span class="block text-xs text-zinc-600">Se mostrará dentro de su periodo de vigencia.</span></span></label><button type="submit" class="admin-btn-primary justify-center sm:min-w-56">Crear campaña</button></div>
+            </form>
+        </section>
 
-        <section class="grid gap-6 xl:grid-cols-[.9fr_1.1fr]">
-            <div class="admin-panel p-6">
-                <div class="mb-6">
-                    <div class="admin-kicker">Nueva campaña</div>
-                    <h2 class="mt-1 text-xl font-black text-white">Agregar publicidad</h2>
-                    <p class="mt-2 text-sm text-zinc-500">Elige si aparecerá al abrir la app o como banner dentro del inicio. Se publica sin actualizar la app.</p>
-                </div>
-
-                <form method="POST" action="{{ route('admin.ads.store') }}" enctype="multipart/form-data" class="space-y-5">
-                    @csrf
-                    <div>
-                        <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Nombre de campaña</label>
-                        <input name="name" value="{{ old('name') }}" required maxlength="120" placeholder="Ej. Restaurante La Casona · Septiembre" class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500">
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Anunciante</label>
-                            <input name="advertiser" value="{{ old('advertiser') }}" maxlength="120" placeholder="Nombre comercial" class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500">
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Estación</label>
-                            <select name="station_id" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
-                                <option value="">Ambas estaciones</option>
-                                @foreach($stations as $station)
-                                    <option value="{{ $station->id }}" @selected((string)old('station_id') === (string)$station->id)>{{ $station->name }}</option>
-                                @endforeach
-                            </select>
+        <section>
+            <div class="mb-4 flex items-center justify-between"><div><div class="admin-kicker">Campañas</div><h2 class="mt-1 text-xl font-black text-white">Publicidad configurada</h2></div><div class="text-xs text-zinc-600">{{ $campaigns->total() }} en total</div></div>
+            <div class="grid gap-5 xl:grid-cols-2">
+            @forelse($campaigns as $campaign)
+                @php $now=now(); $isLive=$campaign->is_active&&(!$campaign->starts_at||$campaign->starts_at<=$now)&&(!$campaign->ends_at||$campaign->ends_at>=$now); $placementLabel=$campaign->placement==='splash'?'Apertura':'Inicio · banner'; @endphp
+                <article class="admin-panel overflow-hidden">
+                    <div class="grid md:grid-cols-[220px_1fr]">
+                        <div class="flex min-h-48 items-center justify-center bg-black/40 p-3"><img src="{{ asset('storage/'.$campaign->image_path) }}" alt="{{ $campaign->name }}" class="{{ $campaign->placement==='splash' ? 'aspect-[9/16] max-h-72' : 'aspect-[16/6] w-full' }} rounded-xl object-cover"></div>
+                        <div class="p-5"><div class="flex items-start justify-between gap-3"><div><div class="flex flex-wrap items-center gap-2"><h3 class="font-black text-white">{{ $campaign->name }}</h3><span class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase {{ $isLive?'bg-emerald-500/10 text-emerald-300':'bg-zinc-500/10 text-zinc-400' }}">{{ $isLive?'Al aire':'Inactiva' }}</span><span class="rounded-full bg-orange-500/10 px-2.5 py-1 text-[10px] font-black uppercase text-orange-300">{{ $placementLabel }}</span></div><p class="mt-1 text-sm text-zinc-500">{{ $campaign->advertiser ?: 'Sin anunciante' }} · {{ $campaign->station?->name ?: 'Ambas estaciones' }}</p></div><form method="POST" action="{{ route('admin.ads.destroy',$campaign) }}" onsubmit="return confirm('¿Eliminar esta campaña?')">@csrf @method('DELETE')<button class="text-xs font-bold text-red-300">Eliminar</button></form></div>
+                        <div class="mt-5 grid grid-cols-3 gap-2"><div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[9px] font-black uppercase text-zinc-600">Impresiones</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->impressions) }}</div></div><div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[9px] font-black uppercase text-zinc-600">Clics</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->clicks) }}</div></div><div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[9px] font-black uppercase text-zinc-600">CTR</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->ctr,2) }}%</div></div></div>
+                        <details class="mt-4 rounded-xl border border-white/10 bg-black/20"><summary class="cursor-pointer px-4 py-3 text-sm font-bold text-zinc-300">Editar campaña</summary><form method="POST" action="{{ route('admin.ads.update',$campaign) }}" enctype="multipart/form-data" class="space-y-3 border-t border-white/10 p-4">@csrf @method('PUT')<input name="name" value="{{ $campaign->name }}" required class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><div class="grid gap-3 sm:grid-cols-2"><input name="advertiser" value="{{ $campaign->advertiser }}" placeholder="Anunciante" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><select name="station_id" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><option value="">Ambas estaciones</option>@foreach($stations as $station)<option value="{{ $station->id }}" @selected($campaign->station_id===$station->id)>{{ $station->name }}</option>@endforeach</select></div><select name="placement" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><option value="splash" @selected($campaign->placement==='splash')>Pantalla completa al abrir</option><option value="home" @selected($campaign->placement==='home')>Banner dentro de Inicio</option></select><input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-sm text-zinc-300"><input type="url" name="target_url" value="{{ $campaign->target_url }}" placeholder="https://..." class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><div class="grid gap-3 sm:grid-cols-2"><input type="datetime-local" name="starts_at" value="{{ $campaign->starts_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"><input type="datetime-local" name="ends_at" value="{{ $campaign->ends_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-white"></div><input type="hidden" name="sort_order" value="{{ $campaign->sort_order }}"><div class="flex items-center justify-between"><label class="flex items-center gap-2 text-sm font-bold text-zinc-300"><input type="checkbox" name="is_active" value="1" @checked($campaign->is_active)> Activa</label><button class="admin-btn-primary">Guardar</button></div></form></details>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Ubicación en la app</label>
-                        <select id="placement" name="placement" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
-                            <option value="splash" @selected(old('placement', 'splash') === 'splash')>Pantalla completa al abrir la app</option>
-                            <option value="home" @selected(old('placement') === 'home')>Banner dentro de Inicio</option>
-                        </select>
-                        <p id="placement-help" class="mt-2 text-xs text-zinc-600">Pantalla completa: se muestra aproximadamente 3 segundos después del splash de Somos Radio.</p>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Imagen publicitaria</label>
-                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" required class="block w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-500 file:px-3 file:py-2 file:text-xs file:font-black file:text-black">
-                        <p class="mt-2 text-xs text-zinc-600">JPG, PNG o WEBP · máximo 4 MB. Apertura: recomendado vertical 1080×1920. Inicio: recomendado horizontal 1200×450.</p>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Enlace al tocar</label>
-                        <input type="url" name="target_url" value="{{ old('target_url') }}" placeholder="https://..." class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white placeholder:text-zinc-600 focus:border-orange-500 focus:ring-orange-500">
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Inicia</label>
-                            <input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Termina</label>
-                            <input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
-                        </div>
-                    </div>
-
-                    <input type="hidden" name="sort_order" value="0">
-
-                    <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-                        <input type="checkbox" name="is_active" value="1" checked class="rounded border-white/20 bg-zinc-900 text-orange-500 focus:ring-orange-500">
-                        <span><span class="block text-sm font-bold text-white">Campaña activa</span><span class="block text-xs text-zinc-600">Solo se mostrará dentro de su periodo de vigencia.</span></span>
-                    </label>
-
-                    <button type="submit" class="admin-btn-primary w-full justify-center">Crear campaña</button>
-                </form>
-            </div>
-
-            <div class="space-y-4">
-                @forelse($campaigns as $campaign)
-                    @php
-                        $now = now();
-                        $isLive = $campaign->is_active && (!$campaign->starts_at || $campaign->starts_at <= $now) && (!$campaign->ends_at || $campaign->ends_at >= $now);
-                        $placementLabel = $campaign->placement === 'splash' ? 'Apertura · pantalla completa' : 'Inicio · banner';
-                    @endphp
-                    <article class="admin-panel overflow-hidden">
-                        <img src="{{ asset('storage/' . $campaign->image_path) }}" alt="{{ $campaign->name }}" class="{{ $campaign->placement === 'splash' ? 'aspect-[9/12]' : 'aspect-[16/6]' }} max-h-[420px] w-full object-cover">
-                        <div class="p-5">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <h3 class="font-black text-white">{{ $campaign->name }}</h3>
-                                        <span class="rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider {{ $isLive ? 'bg-emerald-500/10 text-emerald-300' : 'bg-zinc-500/10 text-zinc-400' }}">{{ $isLive ? 'Al aire' : 'Inactiva' }}</span>
-                                        <span class="rounded-full bg-orange-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-orange-300">{{ $placementLabel }}</span>
-                                    </div>
-                                    <p class="mt-1 text-sm text-zinc-500">{{ $campaign->advertiser ?: 'Sin anunciante' }} · {{ $campaign->station?->name ?: 'Ambas estaciones' }}</p>
-                                </div>
-                                <form method="POST" action="{{ route('admin.ads.destroy', $campaign) }}" onsubmit="return confirm('¿Eliminar esta campaña?')">
-                                    @csrf @method('DELETE')
-                                    <button class="rounded-lg border border-red-500/20 px-3 py-2 text-xs font-bold text-red-300 hover:bg-red-500/10">Eliminar</button>
-                                </form>
-                            </div>
-
-                            <div class="mt-4 grid grid-cols-3 gap-3">
-                                <div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[10px] font-black uppercase tracking-wider text-zinc-600">Impresiones</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->impressions) }}</div></div>
-                                <div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[10px] font-black uppercase tracking-wider text-zinc-600">Clics</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->clicks) }}</div></div>
-                                <div class="rounded-xl bg-white/[0.04] p-3"><div class="text-[10px] font-black uppercase tracking-wider text-zinc-600">CTR</div><div class="mt-1 text-lg font-black text-white">{{ number_format($campaign->ctr, 2) }}%</div></div>
-                            </div>
-
-                            <details class="mt-4 rounded-xl border border-white/10 bg-black/20">
-                                <summary class="cursor-pointer px-4 py-3 text-sm font-bold text-zinc-300">Editar campaña</summary>
-                                <form method="POST" action="{{ route('admin.ads.update', $campaign) }}" enctype="multipart/form-data" class="space-y-4 border-t border-white/10 p-4">
-                                    @csrf @method('PUT')
-                                    <input name="name" value="{{ $campaign->name }}" required class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                    <div class="grid gap-3 sm:grid-cols-2">
-                                        <input name="advertiser" value="{{ $campaign->advertiser }}" placeholder="Anunciante" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                        <select name="station_id" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                            <option value="">Ambas estaciones</option>
-                                            @foreach($stations as $station)
-                                                <option value="{{ $station->id }}" @selected($campaign->station_id === $station->id)>{{ $station->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <select name="placement" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                        <option value="splash" @selected($campaign->placement === 'splash')>Pantalla completa al abrir la app</option>
-                                        <option value="home" @selected($campaign->placement === 'home')>Banner dentro de Inicio</option>
-                                    </select>
-                                    <input type="file" name="image" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-sm text-zinc-300">
-                                    <input type="url" name="target_url" value="{{ $campaign->target_url }}" placeholder="https://..." class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                    <div class="grid gap-3 sm:grid-cols-2">
-                                        <input type="datetime-local" name="starts_at" value="{{ $campaign->starts_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                        <input type="datetime-local" name="ends_at" value="{{ $campaign->ends_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white">
-                                    </div>
-                                    <input type="hidden" name="sort_order" value="{{ $campaign->sort_order }}">
-                                    <label class="flex items-center gap-2 text-sm font-bold text-zinc-300"><input type="checkbox" name="is_active" value="1" @checked($campaign->is_active) class="rounded border-white/20 bg-zinc-900 text-orange-500"> Activa</label>
-                                    <button class="admin-btn-primary">Guardar cambios</button>
-                                </form>
-                            </details>
-                        </div>
-                    </article>
-                @empty
-                    <div class="admin-panel px-6 py-16 text-center"><div class="text-4xl">📢</div><div class="mt-3 font-black text-white">Aún no hay campañas</div><p class="mt-1 text-sm text-zinc-600">Crea el primer anuncio para comenzar.</p></div>
-                @endforelse
-
-                {{ $campaigns->links() }}
-            </div>
+                </article>
+            @empty<div class="admin-panel px-6 py-16 text-center xl:col-span-2"><div class="text-4xl">📢</div><div class="mt-3 font-black text-white">Aún no hay campañas</div><p class="mt-1 text-sm text-zinc-600">Crea el primer anuncio para comenzar.</p></div>@endforelse
+            </div><div class="mt-6">{{ $campaigns->links() }}</div>
         </section>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const placement = document.getElementById('placement');
-            const help = document.getElementById('placement-help');
-            const updateHelp = () => {
-                if (!placement || !help) return;
-                help.textContent = placement.value === 'splash'
-                    ? 'Pantalla completa: se muestra aproximadamente 3 segundos después del splash de Somos Radio.'
-                    : 'Banner de Inicio: aparece debajo de las estaciones y antes de la sección Explora.';
-            };
-            placement?.addEventListener('change', updateHelp);
-            updateHelp();
-        });
-    </script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{const p=document.getElementById('placement'),h=document.getElementById('placement-help');const u=()=>{if(!p||!h)return;h.textContent=p.value==='splash'?'Pantalla completa: 5 segundos una vez cargada la imagen.':'Banner de Inicio: debajo de las estaciones y antes de Explora.'};p?.addEventListener('change',u);u();});</script>
 </x-app-layout>
