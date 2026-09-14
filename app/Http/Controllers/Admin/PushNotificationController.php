@@ -7,10 +7,19 @@ use App\Models\PushDevice;
 use App\Models\PushNotification;
 use App\Services\FirebasePushService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Throwable;
 
 class PushNotificationController extends Controller
 {
+    private const ACTIONS = [
+        'live',
+        'participate',
+        'latest',
+        'play:somos-radio-89-1',
+        'play:somos-radio-102-9',
+    ];
+
     public function index(FirebasePushService $firebase)
     {
         $notifications = PushNotification::query()->latest()->paginate(15);
@@ -29,7 +38,7 @@ class PushNotificationController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:120'],
             'body' => ['required', 'string', 'max:500'],
-            'action' => ['nullable', 'string', 'max:80'],
+            'action' => ['nullable', 'string', Rule::in(self::ACTIONS)],
         ]);
 
         $devices = PushDevice::query()->where('is_active', true)->get();
