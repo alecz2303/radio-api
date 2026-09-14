@@ -20,6 +20,7 @@
                     <a href="{{ route('admin.channels.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.channels.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Canales</a>
                     <a href="{{ route('admin.song-requests.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.song-requests.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Solicitudes</a>
                     <a href="{{ route('admin.push-notifications.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.push-notifications.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Notificaciones</a>
+                    <a href="{{ route('admin.ads.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold transition {{ request()->routeIs('admin.ads.*') ? 'bg-orange-500 text-black' : 'text-zinc-400 hover:bg-white/5 hover:text-white' }}">Publicidad</a>
                 </div>
             </div>
 
@@ -57,6 +58,7 @@
                 <a href="{{ route('admin.channels.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Canales</a>
                 <a href="{{ route('admin.song-requests.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Solicitudes</a>
                 <a href="{{ route('admin.push-notifications.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Notificaciones</a>
+                <a href="{{ route('admin.ads.index') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Publicidad</a>
                 <a href="{{ route('profile.edit') }}" class="rounded-lg px-3 py-2 text-sm font-bold text-zinc-300 hover:bg-white/5">Perfil</a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
