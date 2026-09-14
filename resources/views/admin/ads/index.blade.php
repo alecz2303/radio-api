@@ -41,7 +41,23 @@
                     <div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Ubicación en la app</label><select id="placement" name="placement" class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white"><option value="splash" @selected(old('placement','splash')==='splash')>Pantalla completa al abrir la app</option><option value="home" @selected(old('placement')==='home')>Banner dentro de Inicio</option></select><p id="placement-help" class="mt-2 text-xs text-zinc-600"></p></div>
                 </div>
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Imagen publicitaria</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp" required class="block w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-500 file:px-3 file:py-2 file:text-xs file:font-black file:text-black"><p class="mt-2 text-xs text-zinc-600">WEBP recomendado. Apertura 1080×1920 · Inicio 1200×450 · máximo 4 MB.</p></div>
+                    <div>
+                        <label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Imagen publicitaria</label>
+                        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" required class="block w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-orange-500 file:px-3 file:py-2 file:text-xs file:font-black file:text-black">
+                        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+                            <div class="rounded-xl border border-orange-500/20 bg-orange-500/[0.06] px-3 py-2.5">
+                                <div class="text-[10px] font-black uppercase tracking-[.14em] text-orange-300">Apertura</div>
+                                <div class="mt-1 text-sm font-black text-white">1080 × 1920 px</div>
+                                <div class="mt-0.5 text-[10px] text-zinc-500">Formato vertical · relación 9:16</div>
+                            </div>
+                            <div class="rounded-xl border border-sky-500/20 bg-sky-500/[0.06] px-3 py-2.5">
+                                <div class="text-[10px] font-black uppercase tracking-[.14em] text-sky-300">Inicio</div>
+                                <div class="mt-1 text-sm font-black text-white">1200 × 450 px</div>
+                                <div class="mt-0.5 text-[10px] text-zinc-500">Formato horizontal · banner</div>
+                            </div>
+                        </div>
+                        <p class="mt-2 text-xs text-zinc-600">Medidas recomendadas. WEBP preferido para menor peso · máximo 4 MB.</p>
+                    </div>
                     <div><label class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Enlace al tocar</label><input type="url" name="target_url" value="{{ old('target_url') }}" placeholder="https://..." class="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white"></div>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2">
@@ -140,8 +156,8 @@
             const updateHelp = () => {
                 if (!placement || !help) return;
                 help.textContent = placement.value === 'splash'
-                    ? 'Pantalla completa: 5 segundos una vez cargada la imagen.'
-                    : 'Banner de Inicio: carrusel debajo de las estaciones y antes de Explora.';
+                    ? 'Pantalla completa · recomendado 1080 × 1920 px (9:16) · 5 segundos una vez cargada.'
+                    : 'Banner de Inicio · recomendado 1200 × 450 px · carrusel debajo de las estaciones y antes de Explora.';
             };
             placement?.addEventListener('change', updateHelp);
             updateHelp();
