@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\StationController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\SongRequestController;
 use App\Http\Controllers\Admin\PushNotificationController;
+use App\Http\Controllers\Admin\AdCampaignController;
 use App\Models\Station;
 use App\Models\Channel;
 use App\Models\SongRequest;
@@ -69,4 +70,9 @@ Route::middleware(['auth'])
             ->name('push-notifications.index');
         Route::post('push-notifications', [PushNotificationController::class, 'store'])
             ->name('push-notifications.store');
+
+        Route::get('ads', [AdCampaignController::class, 'index'])->name('ads.index');
+        Route::post('ads', [AdCampaignController::class, 'store'])->name('ads.store');
+        Route::put('ads/{adCampaign}', [AdCampaignController::class, 'update'])->name('ads.update');
+        Route::delete('ads/{adCampaign}', [AdCampaignController::class, 'destroy'])->name('ads.destroy');
     });
