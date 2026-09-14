@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\StationController;
 use App\Http\Controllers\Api\V1\ChannelController;
 use App\Http\Controllers\Api\V1\SongRequestController;
 use App\Http\Controllers\Api\V1\PushDeviceController;
+use App\Http\Controllers\Api\V1\AdCampaignController;
 use App\Http\Controllers\Api\AuthController;
 
 Route::get('/user', function (Request $request) {
@@ -28,4 +29,8 @@ Route::prefix('v1')->group(function () {
     Route::get('stations/{slug}/channels/{channelSlug}', [ChannelController::class, 'show']);
     Route::post('song-requests', [SongRequestController::class, 'store']);
     Route::post('push-devices', [PushDeviceController::class, 'store'])->middleware('throttle:30,1');
+
+    Route::get('ads', [AdCampaignController::class, 'index']);
+    Route::post('ads/{adCampaign}/impression', [AdCampaignController::class, 'impression'])->middleware('throttle:120,1');
+    Route::post('ads/{adCampaign}/click', [AdCampaignController::class, 'click'])->middleware('throttle:60,1');
 });
