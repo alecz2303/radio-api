@@ -50,8 +50,6 @@ class FirebasePushService
                 'notification' => [
                     'channel_id' => 'somos_radio_updates',
                     'sound' => 'default',
-                    'icon' => 'ic_stat_somos_radio',
-                    'color' => '#FF8A00',
                 ],
             ],
         ];
@@ -130,7 +128,7 @@ class FirebasePushService
 
         $jwt = $unsigned.'.'.$this->base64Url($signature);
         $response = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'grant_type' => 'urn:ietf:params:oauth2:grant-type:jwt-bearer',
             'assertion' => $jwt,
         ]);
 
