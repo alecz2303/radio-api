@@ -23,11 +23,13 @@ class PushNotificationController extends Controller
     public function index(FirebasePushService $firebase)
     {
         $notifications = PushNotification::query()->latest()->paginate(15);
-        $activeDevices = PushDevice::where('is_active', true)->count();
+        $devices = PushDevice::query()->orderByDesc('last_seen_at')->orderByDesc('id')->get();
+        $activeDevices = $devices->where('is_active', true)->count();
         $configured = $firebase->configured();
 
         return view('admin.push-notifications.index', compact(
             'notifications',
+            'devices',
             'activeDevices',
             'configured'
         ));
@@ -103,6 +105,42 @@ class PushNotificationController extends Controller
             $failure > 0 ? 'warning' : 'success',
             "Notificación procesada: {$success} enviadas, {$failure} fallidas."
         );
+    }
+
+    public function testDevice(Request $request, FirebasePushService $firebase)
+    {
+        $data = $request->validate([
+            'device_id' => ['required', 'integer', 'exists:push_devices,id'],
+        ]);
+
+        $device = PushDevice::query()->findOrFail($data['device_id']);
+
+        if (!$device->is_active) {
+            return back()->with('error', "El dispositivo #{$device->id} no está activo.");
+        }
+
+        if (!$firebase->configured()) {
+            return back()->with('error', 'Firebase no está configurado en el servidor.');
+        }
+
+        try {
+            $firebase->send(
+                $device->token,
+                '🔔 Prueba directa de Somos Radio',
+                "Envío individual al dispositivo #{$device->id}.",
+                []
+            );
+        } catch (Throwable $e) {
+            $message = $e->getMessage();
+
+            if ($this->isInvalidRegistrationToken($message)) {
+                $device->update(['is_active' => false]);
+            }
+
+            return back()->with('error', "Prueba al dispositivo #{$device->id} falló: {$message}");
+        }
+
+        return back()->with('success', "Prueba enviada únicamente al dispositivo #{$device->id}. Firebase aceptó el mensaje.");
     }
 
     private function isInvalidRegistrationToken(string $message): bool
