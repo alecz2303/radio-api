@@ -9,8 +9,8 @@ class Contest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['station_id','title','question','option_a','option_b','option_c','correct_option','max_winners','prize','redemption_instructions','starts_at','ends_at','is_active','close_when_full'];
-    protected $casts = ['starts_at'=>'datetime','ends_at'=>'datetime','is_active'=>'boolean','close_when_full'=>'boolean','max_winners'=>'integer'];
+    protected $fillable = ['station_id','title','question','option_a','option_b','option_c','correct_option','max_winners','prize','redemption_instructions','starts_at','ends_at','is_active','close_when_full','auto_notify_winners'];
+    protected $casts = ['starts_at'=>'datetime','ends_at'=>'datetime','is_active'=>'boolean','close_when_full'=>'boolean','auto_notify_winners'=>'boolean','max_winners'=>'integer'];
 
     public function station() { return $this->belongsTo(Station::class); }
     public function entries() { return $this->hasMany(ContestEntry::class); }
