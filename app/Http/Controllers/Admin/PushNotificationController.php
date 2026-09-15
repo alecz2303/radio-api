@@ -80,9 +80,10 @@ class PushNotificationController extends Controller
                 $success++;
             } catch (Throwable $e) {
                 $failure++;
-                $errors[] = $e->getMessage();
+                $message = $e->getMessage();
+                $errors[] = $message;
 
-                if (str_contains(strtolower($e->getMessage()), 'registration token')) {
+                if ($this->isInvalidRegistrationToken($message)) {
                     $device->update(['is_active' => false]);
                 }
             }
@@ -102,5 +103,16 @@ class PushNotificationController extends Controller
             $failure > 0 ? 'warning' : 'success',
             "Notificación procesada: {$success} enviadas, {$failure} fallidas."
         );
+    }
+
+    private function isInvalidRegistrationToken(string $message): bool
+    {
+        $message = strtolower($message);
+
+        return str_contains($message, 'notregistered')
+            || str_contains($message, 'unregistered')
+            || str_contains($message, 'registration-token-not-registered')
+            || str_contains($message, 'registration token is not a valid fcm registration token')
+            || str_contains($message, 'requested entity was not found');
     }
 }
