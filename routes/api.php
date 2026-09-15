@@ -9,26 +9,12 @@ use App\Http\Controllers\Api\V1\PushDeviceController;
 use App\Http\Controllers\Api\V1\AdCampaignController;
 use App\Http\Controllers\Api\V1\ContestController;
 use App\Http\Controllers\Api\AuthController;
-
-Route::get('/user', function (Request $request) { return $request->user(); })->middleware('auth:sanctum');
-
-Route::prefix('v1')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::apiResource('stations', StationController::class)->except(['index', 'show']);
-        Route::apiResource('channels', ChannelController::class)->except(['index', 'show']);
-    });
-    Route::get('stations', [StationController::class, 'index']);
-    Route::get('stations/{slug}', [StationController::class, 'show']);
-    Route::get('stations/{slug}/channels', [ChannelController::class, 'index']);
-    Route::get('stations/{slug}/channels/{channelSlug}', [ChannelController::class, 'show']);
-    Route::post('song-requests', [SongRequestController::class, 'store']);
-    Route::post('push-devices', [PushDeviceController::class, 'store'])->middleware('throttle:30,1');
-    Route::get('ads', [AdCampaignController::class, 'index']);
-    Route::post('ads/{adCampaign}/impression', [AdCampaignController::class, 'impression'])->middleware('throttle:120,1');
-    Route::post('ads/{adCampaign}/click', [AdCampaignController::class, 'click'])->middleware('throttle:60,1');
-    Route::get('contests/active', [ContestController::class, 'active'])->middleware('throttle:60,1');
-    Route::post('contests/{contest}/entries', [ContestController::class, 'submit'])->middleware('throttle:20,1');
+Route::get('/user',fn(Request $request)=>$request->user())->middleware('auth:sanctum');
+Route::prefix('v1')->group(function(){
+ Route::post('register',[AuthController::class,'register']);Route::post('login',[AuthController::class,'login']);
+ Route::middleware('auth:sanctum')->group(function(){Route::post('logout',[AuthController::class,'logout']);Route::apiResource('stations',StationController::class)->except(['index','show']);Route::apiResource('channels',ChannelController::class)->except(['index','show']);});
+ Route::get('stations',[StationController::class,'index']);Route::get('stations/{slug}',[StationController::class,'show']);Route::get('stations/{slug}/channels',[ChannelController::class,'index']);Route::get('stations/{slug}/channels/{channelSlug}',[ChannelController::class,'show']);
+ Route::post('song-requests',[SongRequestController::class,'store']);Route::post('push-devices',[PushDeviceController::class,'store'])->middleware('throttle:30,1');
+ Route::get('ads',[AdCampaignController::class,'index']);Route::post('ads/{adCampaign}/impression',[AdCampaignController::class,'impression'])->middleware('throttle:120,1');Route::post('ads/{adCampaign}/click',[AdCampaignController::class,'click'])->middleware('throttle:60,1');
+ Route::get('contests/pending-prize',[ContestController::class,'pendingPrize'])->middleware('throttle:60,1');Route::get('contests/active',[ContestController::class,'active'])->middleware('throttle:60,1');Route::post('contests/{contest}/entries',[ContestController::class,'submit'])->middleware('throttle:20,1');
 });
