@@ -8,6 +8,7 @@ class PushDevice extends Model
 {
     protected $fillable = [
         'token',
+        'device_key',
         'platform',
         'app_version',
         'device_name',
