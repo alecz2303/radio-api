@@ -18,6 +18,30 @@
         @if(session('warning'))<div class="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">{{ session('warning') }}</div>@endif
         @if(session('error'))<div class="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{{ session('error') }}</div>@endif
 
+        <section class="admin-panel p-6">
+            <div class="mb-5 flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-sky-500/15 text-xl">🧪</div>
+                <div><h2 class="text-lg font-black text-white">Prueba por dispositivo</h2><p class="text-sm text-zinc-500">Envía un mensaje únicamente al token seleccionado para diagnosticar FCM.</p></div>
+            </div>
+            <form method="POST" action="{{ route('admin.push-notifications.test-device') }}" class="flex flex-col gap-3 lg:flex-row lg:items-end">
+                @csrf
+                <div class="min-w-0 flex-1">
+                    <label for="device_id" class="mb-2 block text-xs font-black uppercase tracking-[.18em] text-zinc-500">Dispositivo registrado</label>
+                    <select id="device_id" name="device_id" required class="w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-white focus:border-orange-500 focus:ring-orange-500">
+                        <option value="">Selecciona un dispositivo</option>
+                        @foreach($devices as $device)
+                            <option value="{{ $device->id }}" @disabled(!$device->is_active)>
+                                #{{ $device->id }} · {{ $device->platform ?? 'sin plataforma' }} · {{ $device->is_active ? 'ACTIVO' : 'INACTIVO' }} · visto {{ $device->last_seen_at?->format('d/m/Y H:i:s') ?? 'sin fecha' }} · token …{{ substr($device->token, -10) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('device_id')<p class="mt-2 text-xs text-red-300">{{ $message }}</p>@enderror
+                </div>
+                <button type="submit" class="admin-btn-primary justify-center lg:min-w-52" {{ !$configured || $activeDevices === 0 ? 'disabled' : '' }}>Enviar prueba directa</button>
+            </form>
+            <p class="mt-3 text-xs text-zinc-600">La prueba no se envía a los demás teléfonos y muestra solo los últimos 10 caracteres del token para identificarlo sin exponerlo completo.</p>
+        </section>
+
         <section class="grid gap-6 xl:grid-cols-[1.05fr_.95fr]">
             <div class="admin-panel p-6">
                 <div class="mb-6 flex items-center gap-3">
